@@ -65,6 +65,12 @@ wayland-protocols = { path = "../libs/linux/wayland-protocols", features = ["cli
 wayland-egl = { path = "../libs/linux/wayland-egl" }
 naga = { path = "../libs/vulkan/naga", version = "27.0", features = ["wgsl-in", "spv-out"]}
 
+[target.'cfg(all(target_os = "linux", target_env = "musl"))'.dependencies]
+wayland-client = { path = "../libs/linux/wayland-client" }
+wayland-protocols = { path = "../libs/linux/wayland-protocols", features = ["client", "unstable", "staging"] }
+wayland-egl = { path = "../libs/linux/wayland-egl" }
+naga = { path = "../libs/vulkan/naga", version = "27.0", features = ["wgsl-in", "spv-out"]}
+
 [target.'cfg(target_os = "android")'.dependencies]
 ## Note: we must not use local 'path' dependencies on `makepad-jni-sys` or `makepad-android-state`
 ## in order to guarantee that only one instance of each crate exists in the app binary.
