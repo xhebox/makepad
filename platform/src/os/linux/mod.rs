@@ -4,8 +4,9 @@ pub mod opengl_cx;
 pub mod wayland;
 #[cfg(not(any(linux_direct, target_env = "ohos", target_os = "android")))]
 pub mod windowing_backend;
-#[cfg(not(any(linux_direct, target_env = "ohos", target_os = "android")))]
+#[cfg(not(any(linux_direct, wayland_only, target_env = "ohos", target_os = "android")))]
 pub mod x11;
+pub mod linux_event;
 
 #[cfg(linux_direct)]
 pub mod direct;

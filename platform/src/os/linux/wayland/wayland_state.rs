@@ -52,7 +52,7 @@ use crate::{
     event::{PopupDismissReason, PopupDismissedEvent, ScrollEvent, ScrollPhase, WindowGeom},
     select_timer::SelectTimers,
     wayland::wayland_app::WaylandApp,
-    x11::xlib_event::XlibEvent,
+    linux_event::XlibEvent,
     KeyCode, WindowCloseRequestedEvent, WindowGeomChangeEvent, WindowId, WindowMovedEvent,
 };
 

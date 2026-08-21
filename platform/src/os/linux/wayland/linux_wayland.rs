@@ -22,7 +22,7 @@ use crate::os::linux::linux_video_player::{
 use crate::os::linux::v4l2_camera_player::V4l2CameraPlayer;
 use crate::wayland::wayland_app::WaylandApp;
 use crate::wayland::xkb_sys;
-use crate::x11::xlib_event::XlibEvent;
+use crate::linux_event::XlibEvent;
 use crate::WindowId;
 use crate::{
     cx::{LinuxWindowParams, OsType},

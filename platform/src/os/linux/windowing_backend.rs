@@ -15,6 +15,7 @@ fn env_var_is_nonempty(name: &str) -> bool {
     std::env::var_os(name).is_some_and(|value| !value.is_empty())
 }
 
+#[cfg(not(wayland_only))]
 fn is_stdin_loop_mode() -> bool {
     crate::app_main::should_run_stdin_loop_from_env()
 }
@@ -23,8 +24,9 @@ fn forced_windowing_protocol_from_args() -> Option<WindowingProtocol> {
     for arg in std::env::args() {
         if let Some(value) = arg.strip_prefix("--linux-backend=") {
             match value {
-                "x11" => return Some(WindowingProtocol::X11),
                 "wayland" => return Some(WindowingProtocol::Wayland),
+                #[cfg(not(wayland_only))]
+                "x11" => return Some(WindowingProtocol::X11),
                 _ => {}
             }
         }
@@ -34,30 +36,32 @@ fn forced_windowing_protocol_from_args() -> Option<WindowingProtocol> {
 
 // Protocol detection for windowing system
 fn detect_windowing_protocol() -> WindowingProtocol {
-    // stdin-loop mode renders into Studio's RunView via shared framebuffers.
-    // Both X11 and Wayland backends support this path, so let normal
-    // protocol detection proceed instead of forcing X11.
-
-    if let Some(protocol) = forced_windowing_protocol_from_args() {
-        return protocol;
+    #[cfg(wayland_only)]
+    {
+        WindowingProtocol::Wayland
     }
 
-    // Check for Wayland first
-    if env_var_is_nonempty("WAYLAND_DISPLAY") {
-        return WindowingProtocol::Wayland;
-    }
+    #[cfg(not(wayland_only))]
+    {
+        if let Some(protocol) = forced_windowing_protocol_from_args() {
+            return protocol;
+        }
 
-    // Check for X11
-    if env_var_is_nonempty("DISPLAY") {
-        return WindowingProtocol::X11;
-    }
+        if env_var_is_nonempty("WAYLAND_DISPLAY") {
+            return WindowingProtocol::Wayland;
+        }
 
-    // Default to X11 if neither is detected
-    WindowingProtocol::X11
+        if env_var_is_nonempty("DISPLAY") {
+            return WindowingProtocol::X11;
+        }
+
+        WindowingProtocol::X11
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowingProtocol {
+    #[cfg(not(wayland_only))]
     X11,
     Wayland,
 }
@@ -96,12 +100,16 @@ impl Cx {
         match protocol {
             WindowingProtocol::Wayland => {
                 println!("Selected: Wayland backend");
+                #[cfg(wayland_only)]
+                println!("Reason: Wayland-only build configuration");
+                #[cfg(not(wayland_only))]
                 if forced_windowing_protocol_from_args() == Some(WindowingProtocol::Wayland) {
                     println!("Reason: --linux-backend=wayland override");
                 } else {
                     println!("Reason: WAYLAND_DISPLAY environment variable is set");
                 }
             }
+            #[cfg(not(wayland_only))]
             WindowingProtocol::X11 => {
                 println!("Selected: X11 backend");
                 if is_stdin_loop_mode() {
@@ -119,6 +127,7 @@ impl Cx {
         // Launch appropriate backend
         match protocol {
             WindowingProtocol::Wayland => Self::wayland_event_loop(cx),
+            #[cfg(not(wayland_only))]
             WindowingProtocol::X11 => Self::x11_event_loop(cx),
         }
     }
@@ -127,6 +136,7 @@ impl Cx {
         super::wayland::linux_wayland::wayland_event_loop(cx)
     }
 
+    #[cfg(not(wayland_only))]
     fn x11_event_loop(cx: Rc<RefCell<Cx>>) {
         super::x11::linux_x11::x11_event_loop(cx)
     }

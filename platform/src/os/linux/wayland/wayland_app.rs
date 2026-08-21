@@ -7,8 +7,7 @@ use std::{
 use wayland_client::{Connection, EventQueue};
 
 use crate::{
-    cx_native::EventFlow, wayland::wayland_state::WaylandState, x11::xlib_event::XlibEvent,
-    TimerEvent,
+    cx_native::EventFlow, linux_event::XlibEvent, wayland::wayland_state::WaylandState, TimerEvent,
 };
 
 pub(crate) struct WaylandApp {
