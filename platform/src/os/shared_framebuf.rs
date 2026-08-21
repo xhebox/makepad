@@ -428,7 +428,7 @@ pub fn shared_swapchain_from_host_swapchain(
 // Fallback for unsupported platforms
 // ============================================================================
 #[cfg(not(any(
-    all(target_os = "linux", not(target_env = "ohos"), not(wayland_only)),
+    all(target_os = "linux", not(target_env = "ohos")),
     target_os = "macos",
     target_os = "windows"
 )))]
