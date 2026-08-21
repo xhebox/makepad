@@ -91,10 +91,16 @@ impl WaylandCx {
             )
         });
 
+        #[cfg(not(wayland_only))]
         if crate::app_main::should_run_stdin_loop_from_env() {
             cx.borrow_mut().in_makepad_studio = true;
             return cx.borrow_mut().stdin_event_loop();
         }
+        #[cfg(wayland_only)]
+        assert!(
+            !crate::app_main::should_run_stdin_loop_from_env(),
+            "--stdin-loop is unavailable in the Wayland-only build; rebuild without MAKEPAD=wayland_only"
+        );
 
         let mut event_queue = conn.new_event_queue();
         let qhandle = event_queue.handle();

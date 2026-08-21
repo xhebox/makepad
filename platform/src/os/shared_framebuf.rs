@@ -360,7 +360,11 @@ fn software_fallback_image(
     Ok(LinuxOwnedImage::software_fallback(send_fd, stride))
 }
 
-#[cfg(all(target_os = "linux", not(target_env = "ohos")))]
+#[cfg(all(
+    target_os = "linux",
+    not(target_env = "ohos"),
+    not(wayland_only)
+))]
 pub fn shared_swapchain_from_host_swapchain(
     host: &mut HostSwapchain,
     cx: &mut crate::cx::Cx,
@@ -424,7 +428,7 @@ pub fn shared_swapchain_from_host_swapchain(
 // Fallback for unsupported platforms
 // ============================================================================
 #[cfg(not(any(
-    all(target_os = "linux", not(target_env = "ohos")),
+    all(target_os = "linux", not(target_env = "ohos"), not(wayland_only)),
     target_os = "macos",
     target_os = "windows"
 )))]
